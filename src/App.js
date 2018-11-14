@@ -1,93 +1,61 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import './App.css';
+import { Field, reduxForm } from 'redux-form'
 
-
-// @REDUX ACTIONS
-import { sendMessage, addUserAndUpdate } from './actions/senders';
-
-// @COMPONENTS
-import MessageList from './components/messages/MessagesList';
+//@ACTIONS
+import { createUser } from './actions/actions';
 
 class App extends Component {
 
     constructor() {
         super();
-
         this.state = {
-            message: ""
+            name: '',
         };
+        this.handleChange = this.handleChange.bind(this)
     }
 
-    componentDidMount() { this._input.focus(); }
-
-    componentWillMount() { window.addEventListener("beforeunload", this.onCloseFromGoogleChromeHandler) }
-    componentWillUnmount() { window.removeEventListener("beforeunload", this.onCloseFromGoogleChromeHandler) }
-    onCloseFromGoogleChromeHandler = () => {
-        const { addUserAndUpdate, sendMessage } = this.props;
-        addUserAndUpdate(false);
-        sendMessage('Bye bye! ' + localStorage.getItem('userData'));
+    sendDataFromForm = (object) => {
+        this.props.createUser(object);
+        object.preventDefault();
     }
 
-    onValue = (e) => this.setState({ message: e.target.value });
-
-    sendMessage = (e) => {
-        e.preventDefault();
-        this.props.sendMessage(this.state.message);
-        this.setState({
-            message: ""
-        });
+    handleChange = e => {
+        this.setState({ name: e.target.value})
     };
 
-    render() {
+        render() {
 
-        const userList = this.props.userList.length > 0 ? this.props.userList.map(item => (
-            <li style={{ color: item.status ? 'green' : 'red' }} key={item.id}>
-                {item.name}
-            </li>
-        )
-        ) : <div>User list loading...</div>
-        return (
-            <div className="App">
-                <div className="active-users-list">
-                    <ul>
-                        {userList}
-                    </ul>
-                </div>
-                <div className="messsages-container">
-                    <MessageList
-                        messages={this.props.MESSAGES}
-                    />
-                    {/* TODO CREATE COMPONENT WITH HANDLERS*/}
-                    <div className="input-container">
-                        <form onSubmit={this.sendMessage}>
-                            <input
-                                value={this.state.message}
-                                placeholder="Write a message..."
-                                ref={(ref) => this._input = ref}
-                                onChange={this.onValue} type="text" />
-                            <button type="submit">SEND</button>
-                        </form>
+            return (
+
+
+                <form onSubmit={this.sendDataFromForm}>
+                    <div>
+                        <label htmlFor="firstName">First Name</label>
+                        <Field name="name" component="input" type="text" onChange={this.handleChange}/>
                     </div>
-                </div>
-            </div>
-        );
-    }
+                    <button type="submit">SEND</button>
+                </form>
+            );
+        }
 }
+
+App = reduxForm({
+    form: 'badge'
+})(App)
 
 const mapStateToProps = (state) => {
     return {
-        messageStatus: state.sendMessageReducer,
-        MESSAGES: state.messageReducer.messages,
-        userList: state.userListReducer.userList
+        data: state
     }
 };
 
 
+
 const mapDispatchToProps = (dispatch) => {
     return {
-        sendMessage: (message) => dispatch(sendMessage(message)),
-        addUserAndUpdate: (status) => dispatch(addUserAndUpdate(status))
+        createUser: (user) => dispatch(createUser(user)),
     }
 };
 
