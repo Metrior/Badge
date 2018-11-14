@@ -12,8 +12,9 @@ class App extends Component {
         super();
         this.state = {
             name: '',
+            job: '',
         };
-        this.handleChange = this.handleChange.bind(this)
+
     }
 
     sendDataFromForm = (object) => {
@@ -21,21 +22,34 @@ class App extends Component {
         object.preventDefault();
     }
 
-    handleChange = e => {
-        this.setState({ name: e.target.value})
-    };
+
 
         render() {
-
-            return (
-
-
+            const {handleSubmit} = this.props.return (
                 <form onSubmit={this.sendDataFromForm}>
                     <div>
-                        <label htmlFor="firstName">First Name</label>
-                        <Field name="name" component="input" type="text" onChange={this.handleChange}/>
+                        <label>Name</label>
+                        <div>
+                            <Field
+                                name="firstName"
+                                component="input"
+                                type="text"
+                                placeholder="Name"
+                            />
+                        </div>
                     </div>
-                    <button type="submit">SEND</button>
+                    <div>
+                        <label>Job</label>
+                        <div>
+                            <Field name="job" component="select">
+                                <option value="Manager">Manager</option>
+                                <option value="Driver">Driver</option>
+                            </Field>
+                        </div>
+                    </div>
+                    <button type="submit" disabled={this.state.name.length > 20 || this.state.name.match(!/^[A-Za-z]+$/)}>
+                        Submit
+                    </button>
                 </form>
             );
         }
@@ -47,7 +61,7 @@ App = reduxForm({
 
 const mapStateToProps = (state) => {
     return {
-        data: state
+        data: state,
     }
 };
 
